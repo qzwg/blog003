@@ -36,9 +36,9 @@ class BaseModel
     {
         $keys = array_keys($data);
         $values = array_values($data);
-
-        $keyStrings = implode(',',$keys);
-        $valueString = implode(',',$values);
+       
+        $keyString = implode(',',$keys);
+        $valueString = implode("','",$values);
         $sql = "INSERT INTO {$this->tableName} ($keyString) VALUES('$valueString')";
         $this->exec($sql);
 
@@ -46,7 +46,7 @@ class BaseModel
 
     }
 
-    public function update($dat,$where)
+    public function update($data,$where)
     {
         $_arr = [];
         foreach($data as $k => $v)
@@ -56,7 +56,7 @@ class BaseModel
 
         $sets = implode(',',$_arr);
 
-    $sql = "UPDATE {$table->tableName} SET $sets WHERE $where";
+    $sql = "UPDATE {$this->tableName} SET $sets WHERE $where";
 
     return $this->exec($sql);
     }
@@ -77,7 +77,7 @@ class BaseModel
             die($error[2]);
         }
 
-        $ret->setFetchMode(PDO::FETCh_ACCOC);
+        $ret->setFetchMode(PDO::FETCH_ASSOC);
         return $ret;
     }
 

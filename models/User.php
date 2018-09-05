@@ -7,4 +7,6 @@ class User extends BaseModel
         return 'tom';
     }
 
+    public $tableName = 'users';
+
 }
