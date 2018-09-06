@@ -22,6 +22,7 @@ class BlogController
 
     function getChar($num)  // $num为生成汉字的数量
     {
+        
     $b = '';
     for ($i=0; $i<$num; $i++) {
         // 使用chr()函数拼接双字节汉字，前一个chr()为高位字节，后一个为低位字节
@@ -38,6 +39,7 @@ class BlogController
 
     public function index()
     {
+        $blog = new Blog;
         $where = 1;
         //======搜索
         if(isset($_GET['keywords']) && $_GET['keywords'])
@@ -79,14 +81,34 @@ class BlogController
             $orderWay = 'asc';
         }
 
+        //====翻页
+        $perpage = 10;
+        $page = isset($_GET['page']) ? max(1,(int)$_GET['page']) : 1;
+        $offset = ($page-1)*$perpage;
+        $limit = $offset . ',' . $perpage;
+        //=======显示翻页按钮
+        $recordCont = $blog->count($where);
+        $pageCount = ceil($recordCont/$perpage);
+        $pageBtn = '';
+        for($i=1;$i<$pageCount;$i++)
+        {   
+            $urlParams = getUrlParms(['page']);
+            if($i == $page)
+                $class = "class='page_active'";
+            else
+                $class = '';
+            $pageBtn .= "<a $class href='?page={$i}{$urlParams}'>{$i}</a>";
+        }
+
 
 
 
         $blog = new Blog;
-        $blogs = $blog->get("SELECT * FROM blogs WHERE $where ORDER BY $orderBy $orderWay");
+        $blogs = $blog->get("SELECT * FROM blogs WHERE $where ORDER BY $orderBy $orderWay LIMIT $limit");
 
         view('blogs.index',[
-            'blogs'=>$blogs
+            'blogs'=>$blogs,
+            'pageBtn'=>$pageBtn
         ]);
     }
     

@@ -103,6 +103,7 @@ class BaseModel
     public function count($where = 1)
     {
     $sql = "SELECT COUNT(*) FROM {$this->tableName} WHERE $where";
+
     return $this->getOne($sql);
     }
 
