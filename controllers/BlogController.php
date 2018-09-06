@@ -38,8 +38,36 @@ class BlogController
 
     public function index()
     {
+        $where = 1;
+        
+        if(isset($_GET['keywords']) && $_GET['keywords'])
+        {
+            //关键字
+            $where .= " AND (title like '%{$_GET['keywords']}%' OR content like '%{$_GET['keywords']}%')";
+        }
+
+        //发表日期 起始
+        if(isset($_GET['start_date']) && $_GET['start_date'])
+        {
+            $where .= " AND created_at >= '{$_GET['start_date']}'";
+        }
+
+        //截至
+        if(isset($_GET['end_date']) && $_GET['end_date'])
+        {
+            $where .= " AND created_at <= '{$_GET['end_date']}'";
+        }
+
+        //是否显示
+        if(isset($_GET['is_show']) && $_GET['is_show'] !='')
+        {
+            $where .= " AND is_show ={$_GET['is_show']}";
+        }
+
+
+
         $blog = new Blog;
-        $blogs = $blog->get('SELECT * FROM blogs');
+        $blogs = $blog->get("SELECT * FROM blogs WHERE $where");
 
         view('blogs.index',[
             'blogs'=>$blogs

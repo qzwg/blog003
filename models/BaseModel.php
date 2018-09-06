@@ -82,7 +82,7 @@ class BaseModel
     }
 
     public function get($sql)
-    {
+    {   
         $stmt = $this->query($sql);
         return $stmt->fetchAll();
     }
