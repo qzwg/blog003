@@ -39,7 +39,7 @@ class BlogController
     public function index()
     {
         $where = 1;
-        
+        //======搜索
         if(isset($_GET['keywords']) && $_GET['keywords'])
         {
             //关键字
@@ -64,10 +64,26 @@ class BlogController
             $where .= " AND is_show ={$_GET['is_show']}";
         }
 
+        //======排序
+        //默认排序条件
+        $orderBy = 'created_at';
+        $orderWay = 'desc';
+
+        if(isset($_GET['order_by']) && $_GET['order_by'] == 'display')
+        {
+            $orderBy = 'display';
+        }
+        
+        if(isset($_GET['order_way']) && $_GET['order_way'] == 'asc')
+        {
+            $orderWay = 'asc';
+        }
+
+
 
 
         $blog = new Blog;
-        $blogs = $blog->get("SELECT * FROM blogs WHERE $where");
+        $blogs = $blog->get("SELECT * FROM blogs WHERE $where ORDER BY $orderBy $orderWay");
 
         view('blogs.index',[
             'blogs'=>$blogs

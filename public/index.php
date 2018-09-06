@@ -51,3 +51,20 @@ function view($file,$data=[])
         extract($data);
         require ROOT . 'views/' . str_replace('.','/',$file) . '.html';
 }
+
+//获取get参数
+function getUrlParms($except = [])
+{
+    $ret = '';
+
+    foreach($except as $v)
+    {
+        unset($_GET[$v]);
+    }
+    
+    foreach($_GET as $k=>$v)
+    {
+        $ret .= "&$k=$v";
+    }
+    return $ret;
+}

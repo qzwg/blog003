@@ -82,7 +82,8 @@ class BaseModel
     }
 
     public function get($sql)
-    {   
+    {   var_dump($sql);
+        
         $stmt = $this->query($sql);
         return $stmt->fetchAll();
     }

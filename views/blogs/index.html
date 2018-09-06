@@ -4,6 +4,12 @@
     <meta charset="UTF-8">
     <title>日志列表</title>
 </head>
+<style>
+    .order_active{
+        font-size:1.2em;
+        color:#f00;
+    }
+</style>
 <body>
     <h1>日志列表</h1>
     <div>
@@ -25,9 +31,15 @@
         <tr>
             <th>ID</th>
             <th>标题</th>
-            <th>发表日期</th>
+            <th>发表日期
+                <a <?php if(@$_GET['order_by'] == 'date' && @$_GET['order_way'] == 'asc') echo 'class="order_active"' ?> href="?order_by=date&order_way=asc<?=getUrlParms(['order_way','order_by'])?>">☝︎</a>
+                <a <?php if(@$_GET['order_by'] == 'date' && @$_GET['order_way'] == 'desc') echo 'class="order_active"' ?> href="?order_by=date&order_way=desc<?=getUrlParms(['order_way','order_by'])?>">☟</a>
+            </th>
             <th>修改日期</th>
-            <th>浏览量</th>
+            <th>浏览量
+                <a <?php if(@$_GET['order_by'] == 'display' && @$_GET['order_way'] == 'asc') echo 'class="order_active"' ?> href="?order_by=display&order_way=asc<?=getUrlParms(['order_way','order_by'])?>">☝︎</a>
+                <a <?php if(@$_GET['order_by'] == 'display' && @$_GET['order_way'] == 'desc') echo 'class="order_active"' ?> href="?order_by=display&order_way=desc<?=getUrlParms(['order_way','order_by'])?>">☟</a>
+            </th>
             <th>是否显示</th>
             <th>操作</th>
         </tr>
