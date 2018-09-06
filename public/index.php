@@ -56,9 +56,10 @@ function view($file,$data=[])
 function getUrlParms($except = [])
 {
     $ret = '';
-
-    foreach($except as $v)
-    {
+    
+    foreach($except as $k => $v)
+    {  
+       
         unset($_GET[$v]);
     }
     
@@ -66,5 +67,6 @@ function getUrlParms($except = [])
     {
         $ret .= "&$k=$v";
     }
+    
     return $ret;
 }

@@ -41,76 +41,10 @@ class BlogController
     public function index()
     {
         $blog = new Blog;
-        $where = 1;
-        //======搜索
-        if(isset($_GET['keywords']) && $_GET['keywords'])
-        {
-            //关键字
-            $where .= " AND (title like '%{$_GET['keywords']}%' OR content like '%{$_GET['keywords']}%')";
-        }
+        $data = $blog->search();
+   
 
-        //发表日期 起始
-        if(isset($_GET['start_date']) && $_GET['start_date'])
-        {
-            $where .= " AND created_at >= '{$_GET['start_date']}'";
-        }
-
-        //截至
-        if(isset($_GET['end_date']) && $_GET['end_date'])
-        {
-            $where .= " AND created_at <= '{$_GET['end_date']}'";
-        }
-
-        //是否显示
-        if(isset($_GET['is_show']) && $_GET['is_show'] !='')
-        {
-            $where .= " AND is_show ={$_GET['is_show']}";
-        }
-
-        //======排序
-        //默认排序条件
-        $orderBy = 'created_at';
-        $orderWay = 'desc';
-
-        if(isset($_GET['order_by']) && $_GET['order_by'] == 'display')
-        {
-            $orderBy = 'display';
-        }
-        
-        if(isset($_GET['order_way']) && $_GET['order_way'] == 'asc')
-        {
-            $orderWay = 'asc';
-        }
-
-        //====翻页
-        $perpage = 10;
-        $page = isset($_GET['page']) ? max(1,(int)$_GET['page']) : 1;
-        $offset = ($page-1)*$perpage;
-        $limit = $offset . ',' . $perpage;
-        //=======显示翻页按钮
-        $recordCont = $blog->count($where);
-        $pageCount = ceil($recordCont/$perpage);
-        $pageBtn = '';
-        for($i=1;$i<$pageCount;$i++)
-        {   
-            $urlParams = getUrlParms(['page']);
-            if($i == $page)
-                $class = "class='page_active'";
-            else
-                $class = '';
-            $pageBtn .= "<a $class href='?page={$i}{$urlParams}'>{$i}</a>";
-        }
-
-
-
-
-        $blog = new Blog;
-        $blogs = $blog->get("SELECT * FROM blogs WHERE $where ORDER BY $orderBy $orderWay LIMIT $limit");
-
-        view('blogs.index',[
-            'blogs'=>$blogs,
-            'pageBtn'=>$pageBtn
-        ]);
+        view('blogs.index',$data);
     }
 
     //详情页
@@ -130,30 +64,19 @@ class BlogController
         ]);
     }
 
-    //生成静态页
     public function content_to_html()
     {
-        $pdo = new PDO('mysql:host=127.0.0.1;dbname=basic_module', 'root', '123456');
-        $pdo->exec('SET NAMES utf8');
-        
-        $stmt = $pdo->query("SELECT * FROM blogs");
-        $blogs = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-        //开启缓冲
-        ob_start();
-        //写入数据
-        foreach($blogs as $v)
-        {
-            view('blogs.content',[
-                'blog'=>$v,
-            ]);
-
-            //取出
-            $str = ob_get_contents();
-            file_put_contents(ROOT . 'public/contents/' . $v['id'] . '.html',$str);
-            ob_clean();
-        }
-
+        $blog = new Blog;
+        $blog->content_to_html();
     }
+
+    //静态化首页
+    public function index2htm()
+    {
+        $blog = new Blog;
+        $blog->index2htm();
+    }
+
+    
     
 }

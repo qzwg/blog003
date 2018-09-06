@@ -1,1 +1,4 @@
 /public/contents/
+/vendor/
+/composer.lock
+/public/index.html
