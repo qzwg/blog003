@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>发表日志</title>
+</head>
+<body>
+    <h1>发表日志</h1>
+    <form method="post" action="/blog/store">
+        <div>
+            标题：
+            <input type="text" name="title">
+        </div>
+        <div>
+            内容：
+            <textarea name="content" cols="30" rows="10"></textarea>
+        </div>
+        <div>
+            是否显示：
+            <input type="radio" name="is_show" value="0"> 不显示
+            <input type="radio" name="is_show" value="1" checked> 显示
+        </div>
+        <div>
+            <input type="submit" value="发表">
+        </div>
+    </form>
+</body>
+</html>
