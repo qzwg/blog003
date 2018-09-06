@@ -111,5 +111,22 @@ class BlogController
             'pageBtn'=>$pageBtn
         ]);
     }
+
+    //详情页
+    public function detail()
+    {
+        $id = $_GET['id'];
+        $model = new Blog;
+        $blog = $model->find($id);
+
+        $blog['display']++;
+        $model->update([
+            'display'=>$blog['display']
+        ],'id='.$id);
+
+        view('blogs.detail',[
+            'blog'=>$blog
+        ]);
+    }
     
 }
