@@ -1,6 +1,7 @@
 <?php
 namespace controllers;
 use models\Blog;
+use PDO;
 class BlogController
 {
     public function mock()
@@ -127,6 +128,32 @@ class BlogController
         view('blogs.detail',[
             'blog'=>$blog
         ]);
+    }
+
+    //生成静态页
+    public function content_to_html()
+    {
+        $pdo = new PDO('mysql:host=127.0.0.1;dbname=basic_module', 'root', '123456');
+        $pdo->exec('SET NAMES utf8');
+        
+        $stmt = $pdo->query("SELECT * FROM blogs");
+        $blogs = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        //开启缓冲
+        ob_start();
+        //写入数据
+        foreach($blogs as $v)
+        {
+            view('blogs.content',[
+                'blog'=>$v,
+            ]);
+
+            //取出
+            $str = ob_get_contents();
+            file_put_contents(ROOT . 'public/contents/' . $v['id'] . '.html',$str);
+            ob_clean();
+        }
+
     }
     
 }
