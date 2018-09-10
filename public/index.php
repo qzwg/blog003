@@ -1,4 +1,9 @@
 <?php
+ini_set('session.save_handler','redis');
+ini_set('session.save_path','tcp://127.0.0.1:6379?database:3');
+ini_set('session.gcmaxlifetime',600);
+session_start();
+
 define("ROOT",dirname(__FILE__) . '/../');
 
 //类的自动加载
@@ -9,38 +14,36 @@ function autoLoadClass($class)
 
 spl_autoload_register('autoLoadClass');
 //URL的获取
-function route()
+
+if(php_sapi_name() == 'cli')
 {
-    $url = isset($_SERVER['PATH_INFO']) ? $_SERVER['PATH_INFO'] : '/';
-    $defaultController = 'IndexController';
-    $defaultAction = 'index';
-    if($url == '/')
+    $controller = ucfirst($argv[1]) . 'Controller';
+    $action = $argv[2];
+}
+else
+{
+    if(isset($_SERVER['PATH_INFO']))
     {
-        return [
-            $defaultController,
-            $defaultAction
-        ];
-    }
-    else if(strpos($url,'/',1) !== FALSE)
-    {
-        $url = ltrim($url,'/');
-        $route = explode('/',$url);
-        $route[0] = ucfirst($route[0]) . 'Controller';
-        return $route;
+        $pathInfo = $_SERVER['PATH_INFO'];
+        $pathInfo = explode('/',$pathInfo);
+        $controller = ucfirst($pathInfo[1]) . 'Controller';
+        $action = $pathInfo[2];
     }
     else
     {
-        die("请求的URL不正确");
-    }
+        $controller = 'IndexController';
+        $action = 'index';
+    }  
 }
+    
 
-$route = route();
+
+
+
 //请求分发
 
-$controller = "controllers\\{$route[0]}";
-$action = $route[1];
-
-$_C = new $controller;
+$controllers = "controllers\\$controller";
+$_C = new $controllers;
 $_C->$action();
 
 
@@ -69,4 +72,46 @@ function getUrlParms($except = [])
     }
     
     return $ret;
+}
+
+function config($name)
+{
+    static $config = null;
+    if($config === null)
+    {
+        $config = require(ROOT . 'config.php');
+    }
+    return $config[$name];
+}
+
+function redirect($route)
+{
+    header('Location:'.$route);
+    exit;
+}
+function back()
+{
+    redirect($_SERVER['HTTP_REFERER']);
+}
+
+function message($message,$type,$url,$seconds = 5)
+{
+    if($type ==0)
+    {
+        echo "<script>alert('{$message}');location.href='{$url}';</script>";
+        exit;
+    }
+    else if($type == 1)
+    {
+        view('common.success',[
+            'message'=>$message,
+            'url'=>$url,
+            'seconds'=>$seconds
+        ]);
+    }
+    else if($type==2)
+    {
+        $_SESSION['_MESS_'] = $message;
+        redirect($url);
+    }
 }

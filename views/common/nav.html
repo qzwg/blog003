@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+<body>
+    <?php if(isset($_SESSION['_MESS_'])): ?>
+    <div id="_mess_" style="border:1px solid #25b952;background-color:#b9ecbd;padding:5px;">
+        <?=$_SESSION['_MESS_']?>
+    </div>
+    <?php unset($_SESSION['_MESS_']) ?>
+    <script>
+        var m = document.getElementById('_mess_');
+        var s = 3;
+        var si = setInterval(function(){
+            s--;
+            if(s==0)
+            {
+                m.style.display = 'none';
+                clearInterval(si);
+            }
+        },1000);
+
+    </script>
+    <?php endif; ?>
+
+    <h1>智聊系统</h1>
+    <a href="/">首页</a>
+    <a href="/blogs/index">日志列表</a>
+    <?php if(isset($_SESSION['id'])): ?>
+        <?=$_SESSION['email']?>
+        <a href="/user/logout">退出</a>
+    <?php else: ?>
+    <a href="/users/register">注册</a>
+    <a href="/users/login">登陆</a>
+    <?php endif; ?>
+</body>
+</html>

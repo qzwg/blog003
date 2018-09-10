@@ -1,49 +1,60 @@
 <?php
 namespace controllers;
-use models\User;
+// require ROOT . 'vendor/autoload.php';
 class TestController
 {
-    public function insert()
+    public function register()
     {
-        $user = new User;
-        $user->insert([
-            'name'=>'tom',
-            'age'=>10,
-        ]);
 
-        $user->insert([
-            'name'=>'jack',
-            'age'=>12,
-        ]);
+        $redis = \libs\Redis::getInstace();
+        
+        $data = [
+            'email'=>'17805202075@126.com',
+            'title'=>'标题',
+            'content'=>'内容',
+        ];
+
+        $data = json_encode($data);
+        $redis->lpush('email',$data);
+
+        echo '注册成功';
     }
 
-    public function update()
+    public function mail()
     {
-        $user = new User;
+        ini_set('default_socket_timeout',-1);
+        echo '启动。。。。';
+        $redis = \libs\Redis::getInstace();
 
-        $user->update([
-            'age'=>20,
-        ], "name='tom'");
+        while(true)
+        {
+            $data = $redis->brpop('email',0);
+            echo '开始发邮件';
+            echo "发完邮件，继续等待 \r\n";
+        }
     }
 
-    public function get()
+    public function testMail()
     {
-        $user = new User;
+        // 设置邮件服务器账号
+        $transport = (new \Swift_SmtpTransport('smtp.126.com', 25))  // 邮件服务器IP地址和端口号
+        ->setUsername('czxy_qz@126.com')       // 发邮件账号
+        ->setPassword('12345678abcdefg');      // 授权码
 
-        $data = $user->get('SELECT * FROM users');
-        var_dump($data);
+        // 创建发邮件对象
+        $mailer = new \Swift_Mailer($transport);
 
-        $data = $user->find(2);
-        var_dump($data);
+        // 创建邮件消息
+        $message = new \Swift_Message();
 
-        $data = $user->count();
-        var_dump($data);
-    }
+        $message->setSubject('测试标题')   // 标题
+                ->setFrom(['czxy_qz@126.com' => '全栈1班'])   // 发件人
+                ->setTo(['fortheday@126.com', 'fortheday@126.com' => '你好'])   // 收件人
+                ->setBody('Hello <a href="http://localhost:9999">点击激活</a> World ~', 'text/html');     // 邮件内容及邮件内容类型
 
-    public function delete()
-    {
-        $user = new User;
+        // 发送邮件
+        $ret = $mailer->send($message);
 
-        $user->delete("name='jack'");
+        var_dump( $ret );
     }
 }

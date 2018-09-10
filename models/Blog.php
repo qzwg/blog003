@@ -1,6 +1,7 @@
 <?php
 namespace models;
 use PDO;
+require ROOT . 'vendor/autoload.php';
 class Blog extends BaseModel
 {
     public $tableName = 'blogs'; 
@@ -11,6 +12,16 @@ class Blog extends BaseModel
     {
         $this->pdo = new PDO('mysql:host=127.0.0.1;dbname=basic_module', 'root', '123456');
         $this->pdo->exec('SET NAMES utf8');
+    }
+
+    //注册
+    public function add($email,$password)
+    {
+        $stmt = $this->pdo->prepare("INSERT INTO users (email,password) VALUES(?,?)");
+        return $stmt->execute([
+            $email,
+            $password,
+        ]);
     }
 
     public function search()
@@ -80,7 +91,6 @@ class Blog extends BaseModel
          for($i=1;$i<$pageCount;$i++)
          {   
              $params = getUrlParms(['page']);
-             var_dump($params);
           
              $class = $page == $i ? 'page_active' : '';
          
@@ -89,7 +99,6 @@ class Blog extends BaseModel
 
          //===执行
          $stmt = $this->pdo->prepare("SELECT * FROM blogs WHERE $where ORDER BY $odby $odway LIMIT $offset,$perpage");
-         var_dump($stmt);
          
          $stmt->execute($value);
          
@@ -103,7 +112,7 @@ class Blog extends BaseModel
     //生成静态页
     public function content_to_html()
     {
-        
+        // echo "12";   
         $stmt = $this->pdo->query("SELECT * FROM blogs");
         $blogs = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
@@ -138,5 +147,53 @@ class Blog extends BaseModel
 
         $str = ob_get_contents();
         file_put_contents(ROOT . 'public/index.html',$str);
+    }
+
+    //浏览量
+    public function browseNum($id)
+    {
+        $key = "blog-{$id}";
+        $redis = new \Predis\Client([
+            'scheme' => 'tcp',
+            'host'   => '127.0.0.1',
+            'port'   => 6379,
+        ]);
+
+        
+        if($redis->hexists('blog_num',$key))
+        {
+            $newNum = $redis->hincrby('blog_num',$key,1);
+            return $newNum;
+        }
+        else
+        {
+            $stmt = $this->pdo->prepare('SELECT display FROM blogs WHERE id=?');
+            $stmt->execute([$id]);
+            $display = $stmt->fetch(PDO::FETCH_COLUMN);
+
+            $display++;
+            $redis->hset('blog_num',$key,$display);
+            return $display;
+        }
+        
+    }
+
+    //同步浏览量
+    public function displayToDb()
+    {
+        $redis = new \Predis\Client([
+            'scheme' => 'tcp',
+            'host'   => '127.0.0.1',
+            'port'   => 6379,
+        ]);
+    
+        $data = $redis->hgetall('blog_num');
+        
+        foreach($data as $k => $v)
+        {
+            $id = str_replace('blog-','',$k);
+            $sql = "UPDATE blogs SET display={$v} WHERE id = {$id}";
+            $this->pdo->exec($sql);
+        }
     }
 }

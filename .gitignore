@@ -1,4 +1,7 @@
 /public/contents/
+/public/index.html
 /vendor/
 /composer.lock
-/public/index.html
+/config.php
+/public/uploads
+/storage/

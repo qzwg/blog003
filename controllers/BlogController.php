@@ -64,6 +64,7 @@ class BlogController
         ]);
     }
 
+    //生成静态页
     public function content_to_html()
     {
         $blog = new Blog;
@@ -77,6 +78,33 @@ class BlogController
         $blog->index2htm();
     }
 
+    // 浏览量
+    public function display()
+    {
+        $id = (int)$_GET['id'];
+        $blog = new Blog;
+        echo $blog->browseNum($id);
+    }
+
+    //browse_num回显数据路
+    public function displayToDb()
+    {
+        $blog = new Blog;
+        $blog->displayToDb();
+    }
+
+    //发表日志
+    public function store()
+    {
+        $title = $_POST['title'];
+        $content = $_POST['content'];
+        $is_show = $_POST['is_show'];
+
+        $blog = new Blog;
+        $blog->add($title,$content,$is_show);
+
+        message('发表成功',2,'/blog/index');
+    }
     
     
 }
