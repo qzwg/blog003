@@ -26,7 +26,7 @@ class Blog extends BaseModel
 
     public function search()
     {
-        $where = 1;
+        $where = 'user_id='.$_SESSION['id'];
         $value = [];
 
          //======搜索
@@ -194,6 +194,88 @@ class Blog extends BaseModel
             $id = str_replace('blog-','',$k);
             $sql = "UPDATE blogs SET display={$v} WHERE id = {$id}";
             $this->pdo->exec($sql);
+        }
+    }
+
+    public function delete($id)
+    {
+        $stmt = self::$pdo->prepare('DELETE FROM blogs WHERE id = ? AND user_id=?');
+        $stmt->execute([
+            $id,
+            $_SESSION['id'],
+        ]);
+    }
+
+    public function find($id)
+    {
+        $stmt = self::$pdo->prepare('SELECT FROM blogs where id = ?');
+        $stmt->execute([
+            $id
+        ]);
+
+        return $stmt->fetch();
+    }
+
+    public function update($title,$content,$is_show,$id)
+    {
+        $stmt = self::$pdo->prepare("UPDATE blogs SET title=?,content=?,is_show=? WHERE id=?");
+        $stmt->execute([
+            $title,
+            $content,
+            $is_show,
+            $id,
+        ]);
+    }
+
+    //一个日志生成静态页面
+    public function makeHtml($id)
+    {
+        $blog = $this->find($id);
+        ob_start();
+        view('blogs.content',[
+            'blog'=>$blog,
+        ]);
+
+        $str = ob_get_clean();
+
+        file_put_contents(ROOT . 'public/contents/' . $id . '.html',$str);
+
+    }
+
+    //删除静态页
+    public function deleteHtml($id)
+    {
+        @unlink(ROOT . 'public/contents/' . $id . '.html');
+    }
+
+    public function getDisplay($id)
+    {
+        // 使用日志ID拼出键名
+        $key = "blog-{$id}";
+
+        // 连接 Redis
+        $redis = \libs\Redis::getInstance();
+
+        // 判断 hash 中是否有这个键，如果有就操作内存，如果没有就从数据库中取
+        // hexists：判断有没有键
+        if($redis->hexists('blog_displays', $key))
+        {
+            // 累加 并且 返回添加完之后的值
+            // hincrby ：把值加1
+            $newNum = $redis->hincrby('blog_displays', $key, 1);
+            return $newNum;
+        }
+        else
+        {
+            // 从数据库中取出浏览量
+            $stmt = self::$pdo->prepare('SELECT display FROM blogs WHERE id=?');
+            $stmt->execute([$id]);
+            $display = $stmt->fetch( PDO::FETCH_COLUMN );
+            $display++;
+            // 保存到 redis
+            // hset：保存到  Redis
+            $redis->hset('blog_displays', $key, $display);
+            return $display;
         }
     }
 }

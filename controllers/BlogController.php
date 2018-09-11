@@ -83,6 +83,15 @@ class BlogController
     {
         $id = (int)$_GET['id'];
         $blog = new Blog;
+
+        $display = $blog->getDisplay($id);
+
+        echo json_encode([
+            'display' => $display,
+            'email' => isset($_SESSION['email']) ? $_SESSION['email'] : '',
+        ]);
+
+
         echo $blog->browseNum($id);
     }
 
@@ -93,7 +102,7 @@ class BlogController
         $blog->displayToDb();
     }
 
-    //发表日志
+    //发表日志,
     public function store()
     {
         $title = $_POST['title'];
@@ -101,10 +110,61 @@ class BlogController
         $is_show = $_POST['is_show'];
 
         $blog = new Blog;
-        $blog->add($title,$content,$is_show);
+        $id = $blog->add($title,$content,$is_show);
+
+        if($is_show == 1)
+        {
+            $blog->makeHtml($id);
+        }
+        else
+        {
+            $blog->deleteHtml($id);
+        }
+
+        
 
         message('发表成功',2,'/blog/index');
     }
+
+    public function delete()
+    {
+        $id = $_GET['id'];
+        $blog = new Blog;
+        $blog->delete($id);
+
+        message('删除成功',2,'/blog/index');
+    }
+
+    //修改日志
+    public function update()
+    {
+        $title = $_POST['title'];
+        $content = $_POST['content'];
+        $is_show = $_POST['is_show'];
+        $id = $_POST['id'];
+
+        $blog = new Blog;
+        $blog->update($title, $content, $is_show, $id);
+        message('修改成功！',0,'/blog/index');
+    }
+
+    //私有日志
+    public function content()
+    {
+        $id = $_GET['id'];
+        $model = new Blog;
+        $blog = $model->find($id);
+
+        //判断是否是本人日志
+        if($_SESSION['id'] != $blog['user_id'])
+            die('无权访问！');
+
+        view('blogs.content',[
+            'blog'=>$blog,
+        ]);
+    }
+
+    
     
     
 }

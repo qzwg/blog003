@@ -5,12 +5,17 @@
     <title><?=$blog['title']?></title>
 </head>
 <body>
-
+    <h1>智聊系统</h1>
+    <div id="menu"></div>
+    
     <h1><?=$blog['title']?></h1>
-    <p>浏览量：
+    <p>
+        浏览量：
         <span id="display"></span>
-    </p>
+    </p>    
     <p><?=$blog['content']?></p>
+    
+    <?php view('common.footer') ?>
     
 </body>
 </html>
@@ -27,9 +32,31 @@
     $.ajax({
         type:"GET",
         url:url,
+        dataType:'json',
         success:function(data)
         {
-            $("#display").html(data);
+            $("#display").html(data.display);
+
+            var html = '<a href="/">首页</a>';
+
+            //判断是否登陆
+            if(data.email == '')
+            {
+                html += `
+                <a href="/user/register">注册</a>
+                <a href="/user/login">登录</a>
+                    `;
+            }
+            else
+            {
+                html += data.email + 
+                ` <a href="/blog/index">日志列表</a> 
+                      <a href="/blog/create">发表日志</a> 
+                      <a href="/user/login">退出</a>`;
+            }
+
+            //把按钮放进去
+            $("#menu").html(html);
         }
     })
 </script>

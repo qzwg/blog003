@@ -1,6 +1,7 @@
 <?php
 namespace controllers;
 use Models\Base;
+use PDO;
 class MockController extends Base{
     //模拟200个账号
     public function users()
@@ -17,21 +18,47 @@ class MockController extends Base{
             $pdo->exec("INSERT INTO users (email,password) VALUES('$email','$password')");
         }
     }
+
+   
     //模拟300日志
     public function blog()
+{
+    $pdo = new PDO('mysql:host=127.0.0.1;dbname=basic_module', 'root', '123456');
+    $pdo->exec('SET NAMES utf8');
+
+    // 清空表，并且重置 ID
+    $pdo->exec('TRUNCATE blogs');
+
+    for($i=0;$i<300;$i++)
     {
-        self::$pdo->exec('TRUNCATE blogs');
-        for($i=0;$i<300;$i++)
-            {
-                $title = $this->getChar( rand(20,100) ) ;
-                $content = $this->getChar( rand(100,600) );
-                $display = rand(10,500);
-                $is_show = rand(0,1);
-                $date = rand(1233333399,1535592288);
-                $date = date('Y-m-d H:i:s', $date);
-                $user_id = rand(1,20);
-                self::$pdo->exec("INSERT INTO blogs (title,content,display,is_show,created_at,user_id) VALUES('$title','$content',$display,$is_show,'$date',$user_id)");
-            }
+        $title = $this->getChar( rand(20,100) ) ;
+        $content = $this->getChar( rand(100,600) );
+        $display = rand(10,500);
+        $is_show = rand(0,1);
+        $date = rand(1233333399,1535592288);
+        $date = date('Y-m-d H:i:s', $date);
+        $user_id = rand(1,20);
+        $ret = $pdo->exec("INSERT INTO blogs (title,content,display,is_show,created_at,user_id) VALUES('$title','$content',$display,$is_show,'$date',$user_id)");
+        
+        if($ret === false)
+        {
+            $errMS = $pdo->errorInfo();
+            echo '错误码：'.$errMS[0].'<br/>'.'错误编号：'.$errMS[1].'<br/>'.'错误信息：'.$errMS[2].'<br/>';
+        }
+    }
+}
+
+    private function getChar($num)  // $num为生成汉字的数量
+    {
+        $b = '';
+        for ($i=0; $i<$num; $i++) 
+        {
+            // 使用chr()函数拼接双字节汉字，前一个chr()为高位字节，后一个为低位字节
+            $a = chr(mt_rand(0xB0,0xD0)).chr(mt_rand(0xA1, 0xF0));
+            // 转码
+            $b .= iconv('GB2312', 'UTF-8', $a);
+        }
+        return $b;
     }
 
     

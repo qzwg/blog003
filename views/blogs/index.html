@@ -50,14 +50,27 @@
         <?php foreach($data['blogs'] as $blog): ?>
         <tr>
             <td><?=$blog['id']?></td>
-            <td><a target="_blank" href="/contents/<?=$blog['id']?>.html"><?=$blog['title']?></a></td>
+            <td>
+                <?php if($blog['is_show'] == 1) : ?>
+                <a target="_blank" href="/contents/<?=$blog['id']?>.html">
+                    <?=$blog['title']?>
+                </a>
+                <?php else: ?>
+                <a target="_blank" href="/blog/content?id=<?=$blog['id']?>">
+                    <?=$blog['title']?>
+                </a>
+            </td>
             <td><?=$blog['created_at']?></td>
             <td><?=$blog['updated_at']?></td>
             <td><?=$blog['display']?></td>
             <td><?=$blog['is_show']==0?'隐藏':'显示'?></td>
             <td>
                 <a href="">修改</a>
-                <a href="">删除</a>
+                <form action="/blog/delete?id=<?=$v['id']?>" method="post">
+                    <?php csrf_field() ?>
+                    <input type="hidden" name="id" value="<?=$v['id']?>">
+                    <input type="submit" value="删除">
+                </form>
             </td>
         </tr>
         <?php endforeach; ?>
