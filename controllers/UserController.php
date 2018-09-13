@@ -119,5 +119,55 @@ class UserController
         die('退出成功');
     }
 
+    //显示视图
+    public function charge()
+    {
+        view('user.recharge');
+    }
+
+    public function docharge()
+    {
+        $money = $_POST['money'];
+        $model = new Order;
+        $model->create($money);
+
+        message('充值订单已生成，请立即支付！', 2, '/user/orders');
     
+    }
+
+    //列出所有订单
+    public function orders()
+    {
+        $order = new Order;
+        $data = $order->search();
+        view('users.order');
+    }
+    
+    //ajax异步更新余额
+    public function money()
+    {
+        $user = new User;
+        echo $user->getMoney();
+    }
+
+    public function orderStatus()
+    {
+        $sn = $_GET['sn'];
+        $try = 10;
+        
+        $model = new Order;
+        
+        do
+        {
+            $info = $model->findBysn($sn);
+            if($info['status'] == 0)
+            {
+                sleep(1);
+                $try--;
+            } 
+            else
+                break;
+        }while($try>0);
+        echo $info['status'];
+    }
 }

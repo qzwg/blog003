@@ -30,8 +30,11 @@
     <h1>智聊系统</h1>
     <a href="/">首页</a>
     <a href="/blogs/index">日志列表</a>
+    <a href="/user/charge">充值</a>
     <?php if(isset($_SESSION['id'])): ?>
         <?=$_SESSION['email']?>
+        (<span style="color:#f00;font-weight:bold;"><?php=$_SESSION['money']?></span> 元 )
+        <input type="button" value="更新余额">
         <a href="/user/logout">退出</a>
     <?php else: ?>
     <a href="/users/register">注册</a>
@@ -39,3 +42,9 @@
     <?php endif; ?>
 </body>
 </html>
+<script src="/simditor-2.3.6/scripts/jquery.min.js"></script>
+<script>
+    $("#update-money").click(function(){
+        $("#span-money").load("/user/money");
+    })
+</script>

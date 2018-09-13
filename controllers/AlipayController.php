@@ -38,23 +38,7 @@ class AlipayController
         var_dump($data->all());
     }
 
-    public function notify()
-    {
-        $alipay = Pay::alipay($this->config);
-        try{
-            $data = $alipay->verify();
-            echo '订单ID：'.$data->out_trade_no ."\r\n";
-            echo '支付总金额：'.$data->total_amount ."\r\n";
-            echo '支付状态：'.$data->trade_status ."\r\n";
-            echo '商户ID：'.$data->seller_id ."\r\n";
-            echo 'app_id：'.$data->app_id ."\r\n";
-        } catch(\Exception $e){
-            echo '失败';
-            var_dump($e->getMessage());
-        }
 
-        $alipay->success()->send();
-    }
 
     //退款
     public function refund()
@@ -75,5 +59,53 @@ class AlipayController
         {
             var_dump($e->getMessage());
         }
+    }
+
+    public function pay1()
+    {
+        $sn = $_POST['sn'];
+        $order = new \models\Order;
+        $data = $order->findBySn($n);
+        if($data['status'] == 0)
+        {
+            $alipay = Pay::alipay($this->config)->web([
+                'out_trade_no' => $sn,
+                'total_amount' => $data['money'],
+                'subject' => '智聊系统用户充值-'.$data['money'].'元',
+            ]);
+            $display->send();
+        }
+        else
+        {
+            die('订单状态不允许支付~');
+        }
+
+    }
+
+    //更新订单状态
+    public static function notify()
+    {
+        $alipay = Pay::alipay($this->config);
+        try{
+            $data = $alipay->verify();
+            if($data->trade_status == 'TRADE_SUCCESS' || $data->trade_status == 'TRADE_FINISHED')
+            {
+                $order = new \models\Order;
+                $orderInfo = $order->findBySn($data->out_trade_no);
+            }
+
+            //更新用户余额
+            if($orderInfo['status'] == 0)
+            {
+                $order->setPaid($data->out_trade_no);
+
+                $user = new \models\User;
+                $user->addMondy($orderInfo['money'],$orderInfo['user_id']);
+            }
+        }catch(\Exception $e) {
+            die('非法消息');
+        }
+
+        $alipay->success()->send();
     }
 }
