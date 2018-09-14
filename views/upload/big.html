@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>单文件上传</title>
+</head>
+<body>
+   
+        <input id="img"  type="file" name="image">
+        
+    
+</body>
+</html>
+<script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
+<script>
+    //分片上传
+        //前端js分割大文件
+        var img1 = document.getElementById('img');
+        img.onchange = function()
+        {
+            var img1 = this.files[0];
+            var fileSize = img1.size;
+            var perSize = 4096;
+            var count = Math.ceil(fileSize / perSize);
+            var name = "img_"+Math.random(1,99999);
+            for(var i=0;i<count;i++)
+            {
+                var img0 = img1.slice(i*perSize,i*perSize+perSize);
+                var f = new FormData();
+                f.append('img',img0)
+                f.append('count',count)
+                f.append('i',i)
+                f.append('size',perSize)
+                f.append('img_name',name)
+                $.ajax({
+                    type:"POST",
+                    url:"/upload/Big",
+                    data:f,
+                    contentType:false,
+                    processData:false,
+                    success:function(data){
+
+                    }
+                })
+            }
+        }
+        //服务器端合并
+</script>

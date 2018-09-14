@@ -72,6 +72,16 @@ class User extends Base
         $_SESSION['money'] = $money;
         return $money;
     }
+
+    public function setAvatar($path)
+    {
+        $smtt = self::$pdo->prepare('UPDATE users SET avatar=? WHERE id=?');
+        $stmt->execute([
+            $path,
+            $_SESSION['id']
+        ]);
+        
+    }
     
 
 }

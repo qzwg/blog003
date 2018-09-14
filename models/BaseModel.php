@@ -46,20 +46,20 @@ class BaseModel
 
     }
 
-    public function update($data,$where)
-    {
-        $_arr = [];
-        foreach($data as $k => $v)
-        {
-            $_arr[] = "$k='$v'";
-        }
+    // public function update($data,$where)
+    // {
+    //     $_arr = [];
+    //     foreach($data as $k => $v)
+    //     {
+    //         $_arr[] = "$k='$v'";
+    //     }
 
-        $sets = implode(',',$_arr);
+    //     $sets = implode(',',$_arr);
 
-    $sql = "UPDATE {$this->tableName} SET $sets WHERE $where";
+    // $sql = "UPDATE {$this->tableName} SET $sets WHERE $where";
 
-    return $this->exec($sql);
-    }
+    // return $this->exec($sql);
+    // }
 
     public function delete($where)
     {
@@ -107,11 +107,11 @@ class BaseModel
     return $this->getOne($sql);
     }
 
-    public function find($id,$select='*')
-    {
-        $sql = "SELEcT {$select} FROM {$this->tableName} WHERE id={$id}";
-        return $this->getRow($sql);
-    }
+    // public function find($id,$select='*')
+    // {
+    //     $sql = "SELEcT {$select} FROM {$this->tableName} WHERE id={$id}";
+    //     return $this->getRow($sql);
+    // }
 
     
 }

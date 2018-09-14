@@ -1,6 +1,7 @@
 <?php
 namespace controllers;
-// require ROOT . 'vendor/autoload.php';
+use libs;
+// require ROOT . 'vendor/autolode.php';
 class TestController
 {
     public function register()
@@ -56,5 +57,30 @@ class TestController
         $ret = $mailer->send($message);
 
         var_dump( $ret );
+    }
+
+    //批量上传图片
+    public function upload()
+    {
+        view('test.upload');
+    }
+
+    public function uploadImg()
+    {
+        var_dump($_FILES);
+        echo '<pre>';
+       foreach($_FILES as $k => $v)
+       {   
+        var_dump($k);
+
+           var_dump($v);
+       }
+    }
+
+    public function testRedis()
+    {
+        $redis =  \libs\Redis::getInstance();
+        
+        var_dump($redis);
     }
 }

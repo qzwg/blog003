@@ -14,6 +14,16 @@ class Blog extends BaseModel
         $this->pdo->exec('SET NAMES utf8');
     }
 
+    //Excel下载
+    public function getNew()
+    {
+        $sql = $this->pdo->query('SELECT * FROM  blogs LIMIT 10');
+
+        $stmt = $sql->fetchAll();
+        return $stmt;
+    }
+
+
     //注册
     public function add($email,$password)
     {

@@ -5,16 +5,17 @@ ini_set('session.gcmaxlifetime',600);
 session_start();
 
 //防csrf攻击
-if($_SERVER['REQUEST_METHOD'] == 'POST')
-{
-    if(!isset($_POST['_token']))
-        die('违法操作！');
-    if($_POST['_token'] != $_SESSION['token'])
-        die('违法操作！');
-}
+// if($_SERVER['REQUEST_METHOD'] == 'POST')
+// {
+//     if(!isset($_POST['_token']))
+//         die('违法操作！');
+//     if($_POST['_token'] != $_SESSION['token'])
+//         die('违法操作！');
+// }
 
 
 define("ROOT",dirname(__FILE__) . '/../');
+
 
 //类的自动加载
 function autoLoadClass($class)
@@ -47,7 +48,7 @@ else
 }
     
 
-
+require(ROOT.'vendor/autoload.php');
 
 
 //请求分发
@@ -55,7 +56,6 @@ else
 $controllers = "controllers\\$controller";
 $_C = new $controllers;
 $_C->$action();
-
 
 //view方法
 function view($file,$data=[])

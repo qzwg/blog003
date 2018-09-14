@@ -104,6 +104,11 @@ class UserController
         $user = new User;
         if($user->login($email,$password))
         {
+            $_SESSION['id'] = $user['id'];
+            $_SESSION['email'] = $user['email'];
+            $_SESSION['money'] = $user['money'];
+            $_SESSION['avatar'] = $user['avatar'];
+
             message('登陆成功',2,'/blog/index');
         }
         else
@@ -169,5 +174,19 @@ class UserController
                 break;
         }while($try>0);
         echo $info['status'];
+    }
+
+    //设置新头像
+    public function setvatar()
+    {
+        $upload = \libs\Uploader::make();
+        $path = $upload->upload('avatar','avatar');
+
+        $model = \models\User;
+        $model->setAvatar('/uploads/' . $path);
+        @unlick(ROOT . 'public' . $_SESSION['avatar']);
+
+        $_SESSION['avatar'] = '/uploads/' . $path;
+        message("设置成功",2,'/blog/inex');
     }
 }
