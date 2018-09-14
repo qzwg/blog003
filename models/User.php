@@ -80,7 +80,14 @@ class User extends Base
             $path,
             $_SESSION['id']
         ]);
-        
+
+    }
+
+    //获取所有账号方法
+    public function getAll()
+    {
+        $stmt = self::$pdo->query('SELECT * FROM users');
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
     
 

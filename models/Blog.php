@@ -288,4 +288,19 @@ class Blog extends BaseModel
             return $display;
         }
     }
+
+    public function agreeList($id)
+    {
+        $sql = 'SELECT b.id,b.email,b.avatar
+                    FROM blog_agrees a 
+                        LEFT JOIN users b ON a.user_id = b.id 
+                            WHERE a.blog_id=?';
+        $stmt = self::$pdo->prepare($sql);
+        $stmt->execute([
+            $id
+        ]);
+
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    }
 }

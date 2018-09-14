@@ -164,6 +164,54 @@ class BlogController
         ]);
     }
 
+    //点赞
+    public function agreements()
+    {
+        $id = $_GET['id'];
+        //判断是否登陆
+        if(!isset($_SESSION['id']))
+        {
+            echo json_encode([
+                'status_code' => '403',
+                'message'=>'必须先登陆'
+            ]);
+
+            exit;
+        }
+
+        //点赞
+        $model = new \models\Blog;
+        $ret = $model->agree($id);
+        if($ret)
+        {
+            echo json_encode([
+                'status_code' => '200',
+            ]);
+            exit;
+        }
+        else
+        {
+            echo json_encode([
+                'status_code'=> '403',
+                'message' => '已经点赞过了'
+            ]);
+            exit;
+        }
+    }
+
+    //获取点赞用户数量
+    public  function agreements_list()
+    {
+        $id = $_GET['id'];
+        $model = new \models\Blog;
+        $data = $model->agreeList($id);
+
+        echo json_encode([
+            'status_code' => 200,
+            'data' => $data,
+        ]);
+    }
+
     
     
     
