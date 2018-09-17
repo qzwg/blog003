@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <script src="/cropper/cropper.min.js"></script>
+    <link rel="stylesheet" href="/cropper/cropper.min.css">
+    <title>设置头像</title>
+</head>
+<style>
+    .img-container{
+        width: 500px;
+        height: 500px;
+        float: left;
+    }    
+    
+    .img-preview{
+        float:left;
+        overflow:hidden;
+        margin-left:20px;
+    }
+    .preview-lg{
+        width: 240px;
+        height: 240px;
+    }
+    .preview-md{
+        width: 80px;
+        height: 80px;
+    }
+</style>
+<body>
+    <h1>智聊系统</h1>
+    <form action="/user/setavatar" method="post" enctype="multipart/form-data">
+        <?=csrf_field()?>
+
+        <!-- 显示视图 -->
+        <div class="img-contariner">
+            <img src="" alt="Picture" id="image">
+        </div>
+
+        <!-- 预览图片 -->
+        <div class="docs-preview clearfix">
+            <div class="img-preview peview-lg"></div>
+            <div class="img-preview peview-md"></div>
+        </div>
+        <!-- 选择头像 -->
+        <div>
+            选择头像:
+            <input type="file" name="avatar" id="img">
+        </div>
+
+        <div>
+            <input type="submit" value="上传">
+        </div>
+
+        <!-- 保存裁剪数值 -->
+    </form>
+    
+</body>
+</html>
+<script>
+    var $image = $('#image')
+    var x = $("#x")
+    var y = $("#y")
+    var w = $("#w")
+    var h = $("#h")
+
+    $("#img").change(function(){
+        var url = getObjectUrl(this.files[0]);
+        $image.attr('src',url);
+        $image.cropper("destroy");
+        /* 启动 cropper 插件 */
+        $image.cropper({
+            aspectRatio: 1,                              // 缩略图1:1的比例
+            preview:'.img-preview',                      // 显示缩略图的框
+            viewMode:3,                                  // 显示模式
+            // 裁切时触发事件
+            crop: function(event) {
+                x.val(event.detail.x);             // 裁切区域左上角x坐标
+                y.val(event.detail.y);             // 裁切区域左上角y坐标
+                w.val(event.detail.width);         // 裁切区域宽高
+                h.val(event.detail.height);        // 裁切区域高度
+            }
+        })
+    })
+// 预览时需要使用下面这个函数转换一下(为了兼容不同的浏览器，所以要判断支持哪一种函数就使用哪一种)
+    function getObjectUrl(file) {
+        var url = null;
+        if (window.createObjectURL != undefined) {
+            url = window.createObjectURL(file)
+        } else if (window.URL != undefined) {
+            url = window.URL.createObjectURL(file)
+        } else if (window.webkitURL != undefined) {
+            url = window.webkitURL.createObjectURL(file)
+        }
+        return url
+    }
+</script>

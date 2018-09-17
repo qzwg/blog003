@@ -38,8 +38,10 @@
         <?=$_SESSION['email']?>
         (<span style="color:#f00;font-weight:bold;"><?php=$_SESSION['money']?></span> 元 )
         <input type="button" value="更新余额">
+        
         <a href="/user/logout">退出</a>
     <?php else: ?>
+    <a href="/redbag/rodbag/rob_view" style="color:#F00;font-size:1.2em;">快来抢啊</a>
     <a href="/users/register">注册</a>
     <a href="/users/login">登陆</a>
     <?php endif; ?>

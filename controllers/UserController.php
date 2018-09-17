@@ -179,8 +179,15 @@ class UserController
     //设置新头像
     public function setvatar()
     {
+        //上传头像
         $upload = \libs\Uploader::make();
         $path = $upload->upload('avatar','avatar');
+
+        //裁剪图片
+        $image = Image::make(ROOT . 'public/uploads/' . $path);
+        $image->crop((int)$_POST['w'],(int)$_POST['h'],(int)$_POST['x'],(int)$_POST['y']);
+        //保存时覆盖原图
+        $image->save(ROOT . 'public/uploads/' . $path);
 
         $model = \models\User;
         $model->setAvatar('/uploads/' . $path);
@@ -189,4 +196,5 @@ class UserController
         $_SESSION['avatar'] = '/uploads/' . $path;
         message("设置成功",2,'/blog/inex');
     }
+
 }

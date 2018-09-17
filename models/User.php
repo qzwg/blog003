@@ -89,6 +89,7 @@ class User extends Base
         $stmt = self::$pdo->query('SELECT * FROM users');
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
+
     
 
 }
