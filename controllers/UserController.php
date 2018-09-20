@@ -197,4 +197,11 @@ class UserController
         message("设置成功",2,'/blog/inex');
     }
 
+    //日志活跃用户
+    public function setActiveUsers()
+    {
+        $user = new User;
+        $user->computeActiveUsers();
+    }
+
 }

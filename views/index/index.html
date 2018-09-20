@@ -24,6 +24,15 @@
     <select id="alluser">
         <option value="">选择账号</option>
     </select>
+    <h1>一周活跃用户</h1>
+        <ul>
+            <?php foreach($users as $v): ?>
+                <li>
+                    <img size="50" height="50" src="<?= $v['avatar'] ? $v['avatar'] : '/images/avatar.jpg' ?>" 
+                        title="<?=$v['email']?>"
+                    alt="">
+                </li>
+        </ul>
     <?php endif; ?>
 </body>
 </html><script
